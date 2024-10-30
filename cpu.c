@@ -579,10 +579,259 @@ void decode_and_execute(gameboy *gb, char opcode) {
             }
         break;
 
-        case 0x40:  // Block 1
+        case 0x40:  // Block 1 (ld r8, r8)
+            unsigned char r8_source;
+            unsigned char *r8_dest;
+            // Iterate over values of source r8
+            switch (opcode & 0x07) {
+                case 0:  // r8 = b
+                    r8_source = gb->regs->b;
+                break;
+
+                case 1:  // r8 = c
+                    r8_source = gb->regs->c;
+                break;
+
+                case 2:  // r8 = d
+                    r8_source = gb->regs->d;
+                break;
+
+                case 3:  // r8 = e
+                    r8_source = gb->regs->e;
+                break;
+
+                case 4:  // r8 = h
+                    r8_source = gb->regs->h;
+                break;
+
+                case 5:  // r8 = l
+                    r8_source = gb->regs->l;
+                break;
+
+                case 6:  // r8 = [hl]
+                    r8_source = read_memory(gb->memory, get_hl(gb->regs));
+                break;
+
+                case 7:  // r8 = a
+                    r8_source = gb->regs->a;
+                break;
+            }
+
+            // Iterate over values of dest r8
+            switch ((opcode >> 3) & 0x07) {
+                case 0:  // r8_dest = b
+                    gb->regs->b = r8_source;
+                break;
+
+                case 1:  // r8_dest = c
+                    gb->regs->c = r8_source;
+                break;
+
+                case 2:  // r8_dest = d
+                    gb->regs->d = r8_source;
+                break;
+
+                case 3:  // r8_dest = e
+                    gb->regs->e = r8_source;
+                break;
+
+                case 4:  // r8_dest = h
+                    gb->regs->h = r8_source;
+                break;
+
+                case 5:  // r8_dest = l
+                    gb->regs->l = r8_source;
+                break;
+
+                case 6:  // r8_dest = [hl]
+                    if ((opcode & 0x07) == 6) {
+                        // TODO: HALT
+                    } else {
+                        write_memory(gb->memory, get_hl(gb->regs), r8_source);
+                    }
+                break;
+
+                case 7:  // r8_dest = a
+                    gb->regs->a = r8_source;
+                break;
+            }
         break;
 
         case 0x80:  // Block 2
+            // We simply need to iterate over bits 3-5
+            switch ((opcode >> 3) & 0x07) {
+                case 0:  // add a, r8
+                    // Iterate over possible values of r8
+                    unsigned short val;
+                    switch (opcode & 0x07) {
+                        case 0:  // r8 = b
+                            val = gb->regs->a + gb->regs->b;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->b & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 1:  // r8 = c
+                            val = gb->regs->a + gb->regs->c;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->c & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 2:  // r8 = d
+                            val = gb->regs->a + gb->regs->d;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->d & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 3:  // r8 = e
+                            val = gb->regs->a + gb->regs->e;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->e & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 4:  // r8 = h
+                            val = gb->regs->a + gb->regs->h;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->h & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 5:  // r8 = l
+                            val = gb->regs->a + gb->regs->l;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->l & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 6:  // r8 = [hl]
+                            val = gb->regs->a + read_memory(gb->memory, get_hl(gb->regs));
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (read_memory(gb->memory, get_hl(gb->regs)) & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+
+                        case 7:  // r8 = a
+                            val = gb->regs->a + gb->regs->a;
+
+                            // Update flags
+                            clear_c(gb->regs);
+                            clear_z(gb->regs);
+                            clear_h(gb->regs);
+                            clear_n(gb->regs);
+                            
+                            if ((val & 0xFF) == 0)
+                                set_z(gb->regs);
+                            if ((gb->regs->a & 0x0F) + (gb->regs->a & 0x0F) > 0x0F)
+                                set_h(gb->regs);
+                            if (val > 0xFF)
+                                set_c(gb->regs);
+                            gb->regs->a = val & 0xFF;
+                        break;
+                    }
+                break;
+
+                case 1:  // adc a, r8
+                break;
+
+                case 2:
+                break;
+
+                case 3:
+                break;
+
+                case 4:
+                break;
+
+                case 5:
+                break;
+
+                case 6:
+                break;
+
+                case 7:
+                break;
+            }
+
         break;
 
         case 0xC0:  // Block 3
